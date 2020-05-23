@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -77,6 +78,49 @@ public class ORDSTestsDay4 {
                 accept(ContentType.JSON).
                 when().
                 get("/countries").prettyPeek();
+    }
+
+
+    @Test
+    public void getEmployeeTest(){
+        Response response = when().get("/employees").prettyPeek();
+
+        //collectionName.max{it.propertyName}
+        Map<String, ?> bestEmployee = response.jsonPath().get("items.max{it.salary}");
+        System.out.println("best Employee = " + bestEmployee);
+
+        Map<String, ?> poorGuy = response.jsonPath().get("items.min{it.salary}");
+
+        int companiesPayroll = response.jsonPath().get("items.collect{it.salary}.sum()");
+
+        System.out.println("poorGuy = " + poorGuy);
+        System.out.println("companiesPayroll = " + companiesPayroll);
+
+
+    }
+
+    @Test
+    @DisplayName("Verify that every employee has positive salary")
+    public void testSalary(){
+                when().
+                       get("/employees").
+                then().assertThat().
+                                    statusCode(200).
+                                    body("items.salary",everyItem(greaterThan(0))).
+                                    log().ifError();
+    }
+
+    @Test
+    public void verifyPhoneNumber(){
+        Response response = when().get("/employees/{id}",101).prettyPeek();
+        response.then().assertThat().statusCode(200);
+
+        String expected = "515-123-4568";
+        String actual = response.jsonPath().getString("phone_number").replace(".","-");
+
+        assertEquals(200,response.statusCode());
+        assertEquals(expected,actual);
+
     }
 
 
