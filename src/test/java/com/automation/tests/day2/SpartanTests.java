@@ -24,14 +24,15 @@ public class SpartanTests {
 
         //401 - unauthorized
         //how to provide credentials?
-        //there different type of authentication: basic, oauth 1.0, oauth2.0, api key, bearer token,etc..
+        //different type of authentication: basic, oauth, oauth2.0, api key, bearer token,etc..
         //spartan app requires basic authentication: username and password
                 given().
                         auth().basic("admin","admin").
                         baseUri(BASE_URL).
                 when().
-                get("api/spartans").prettyPeek().
-                        then().statusCode(200);
+                        get("api/spartans").prettyPeek().
+                then().
+                        statusCode(200);
     }
 
     @Test
@@ -40,10 +41,12 @@ public class SpartanTests {
 
         //JSON supports different data types: string, integer, boolean
         String body = "{\"gender\": \"Male\", \"name\": \"Random User\", \"phone\": 9999999999}";
+
         //instead of string variable, we can use external JSON file
         //use File class to read JSON and pass it into body
         //provide path to the JSON as a parameter
         File jsonFile = new File(System.getProperty("user.dir") + "/spartan.json");
+
         //to create new item, we perform POST request
         //contentType(ContentType.JSON) - to tell web service what kind of media type we send
         given().
@@ -51,10 +54,10 @@ public class SpartanTests {
                 auth().basic("admin", "admin").
                 body(jsonFile).
                 baseUri(BASE_URL).
-                when().
+        when().
                 post("/api/spartans").prettyPeek().
-                then().
-                statusCode(201);
+        then().
+                statusCode(201);  //201 is created
 
     }
 
